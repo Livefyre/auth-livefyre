@@ -8,25 +8,35 @@ var permissions = module.exports = {};
 permissions._authApi = authApi;
 
 /**
- * Fetch permissions for a Livefyre Collection
- * @param token {string} lftoken of user you want permissions for
+ * Fetch a user's permissions for a Livefyre Collection
+ * @param tokenOrUser.user {object} user you want permissions for
+ * @param tokenOrUser.token {object} If you don't haz the user, supply a token
  * @param collection.network {string} Network of Collection
  * @param collection.siteId {string} Site ID of Collection
  * @param collection.articleId {string} Article ID of Collection
  * @throws Error if you didn't pass all required Collection info
  */
-permissions.forCollection = function (token, collection, errback) {
+permissions.forCollection = function (tokenOrUser, collection, errback) {
     validateCollection(collection);
 
     var opts = Object.create(collection);
-    opts.token = token;
+    opts.token = opts.token || opts.user.get('token');
 
+    var user = opts.user || new LivefyreUser();
+
+    var updateUser = this._authApi.updateUser.bind(this._authApi);
     this._authApi.authenticate(opts, function (err, resp) {
         if (err) {
             return errback(err);
         }
-        var authorization = new CollectionAuthorization(collection, resp);
-        errback(null, authorization);
+        // bad, duplicated from user-service
+        if ( ! userInfo.profile) {
+            err = new Error('fetch-user got empty auth response');
+            return errback(err);
+        }
+
+        updateUser(user, resp);
+        errback(null, user, resp);
     });
 };
 

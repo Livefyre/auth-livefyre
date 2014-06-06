@@ -91,7 +91,7 @@ authApi.updateUser = function (user, userInfo, userInfoCollection) {
     var tokenExpiresAt = tokenDescriptor && new Date((+new Date()) + tokenDescriptor.ttl * 1000);
     var collectionId = userInfo['collection_id'];
     var collectionAuthorization;
-    
+
     var attributes = extend({}, profile, {
         token: token,
         tokenExpiresAt: tokenExpiresAt
@@ -244,6 +244,6 @@ function networkFromToken (token) {
 
 function serverUrlFromToken(token) {
     var network = networkFromToken(token);
-    var serverUrl = document.location.protocol + '//admin.' + network;
+    var serverUrl = document.location.protocol + '//admin.' + 'fy.re';  // hack want server url
     return serverUrl;
 }

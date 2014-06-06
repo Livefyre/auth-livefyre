@@ -115,6 +115,20 @@ function isModByCollectionId(collectionId) {
 }
 
 /**
+ * @param collectionId {string} A Collection ID
+ * @return {CollectionAuthorization}
+ */
+function getAuthorizationByCollectionId(collectionId) {
+    var isMod = this.authorizations.some(function (authorization) {
+        var collection = authorization.collection;
+        return Boolean(authorization.moderatorKey &&
+            collection &&
+            collection.id === collectionId);
+    });
+    return isMod;
+}
+
+/**
  * Check if user is known to be a moderator of a given Network
  * @param networkId {string} A Network name
  * @return {boolean}
@@ -161,6 +175,14 @@ LivefyreUser.prototype.isMod = function(scopeObj) {
     }
     return;
 };
+
+/**
+ * @param collId {string}
+ * @return {Array}
+ */
+ LivefyreUser.prototype.getKeys = function (collId) {
+     var authorization =
+ };
 
 /**
  * Set up singleton user object.
