@@ -105,13 +105,7 @@ function isModByCollectionInfo(scopeObj) {
  * @return {boolean}
  */
 function isModByCollectionId(collectionId) {
-    var isMod = this.authorizations.some(function (authorization) {
-        var collection = authorization.collection;
-        return Boolean(authorization.moderatorKey &&
-            collection &&
-            collection.id === collectionId);
-    });
-    return isMod;
+    return Boolean(getAuthorizationByCollectionId(collectionId));
 }
 
 /**
@@ -119,13 +113,16 @@ function isModByCollectionId(collectionId) {
  * @return {CollectionAuthorization}
  */
 function getAuthorizationByCollectionId(collectionId) {
-    var isMod = this.authorizations.some(function (authorization) {
-        var collection = authorization.collection;
-        return Boolean(authorization.moderatorKey &&
+    var collection;
+    for (var i = 0; i < this.authorizations.length; i++) {
+        var collection = this.authorizations[i];
+        if (this.authorizations[i].moderatorKey &&
             collection &&
-            collection.id === collectionId);
-    });
-    return isMod;
+            collection.id === collectionId) {
+            return collection;
+        }
+    }
+    return null;
 }
 
 /**
@@ -177,11 +174,16 @@ LivefyreUser.prototype.isMod = function(scopeObj) {
 };
 
 /**
- * @param collId {string}
+ * @param collectionId {string}
  * @return {Array}
  */
- LivefyreUser.prototype.getKeys = function (collId) {
-     var authorization =
+ LivefyreUser.prototype.getKeys = function (collectionId) {
+     var authorization = getAuthorizationByCollectionId.call(this, collectionId);
+     if (authorization) {
+        return authorization.authors.map(function(authorObj) {
+            return authorObj.key;
+        }).push(authorization.moderatorKey);
+     }
  };
 
 /**

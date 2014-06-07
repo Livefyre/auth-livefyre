@@ -9,8 +9,7 @@ permissions._authApi = authApi;
 
 /**
  * Fetch a user's permissions for a Livefyre Collection
- * @param tokenOrUser.user {object} user you want permissions for
- * @param tokenOrUser.token {object} If you don't haz the user, supply a token
+ * @param tokenOrUser {string|object} token or user you want permissions for
  * @param collection.network {string} Network of Collection
  * @param collection.siteId {string} Site ID of Collection
  * @param collection.articleId {string} Article ID of Collection
@@ -18,14 +17,18 @@ permissions._authApi = authApi;
  */
 permissions.forCollection = function (tokenOrUser, collection, errback) {
     validateCollection(collection);
-
+    var user;
     var opts = Object.create(collection);
-    opts.token = opts.token || opts.user.get('token');
-
-    var user = opts.user || new LivefyreUser();
+    if (typeof tokenOrUser === 'string') {
+        opts.token = tokenOrUser;
+        user = new LivefyreUser();
+    } else {
+        opts.token = tokenOrUser.get('token');
+        user = tokenOrUser;
+    }
 
     var updateUser = this._authApi.updateUser.bind(this._authApi);
-    this._authApi.authenticate(opts, function (err, resp) {
+    this._authApi.authenticate(opts, function (err, userInfo) {
         if (err) {
             return errback(err);
         }
@@ -35,8 +38,8 @@ permissions.forCollection = function (tokenOrUser, collection, errback) {
             return errback(err);
         }
 
-        updateUser(user, resp);
-        errback(null, user, resp);
+        updateUser(user, userInfo);
+        errback(null, user, userInfo);
     });
 };
 
