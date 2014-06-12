@@ -188,13 +188,14 @@ LivefyreUser.prototype.getKeys = function (collection, errback) {
     var user = this;
 
     function collKeyset(authorization) {
+        var authorKeys = authorization.authors.map(function(authorObj) {
+            return authorObj.key;
+        });
         if (authorization.moderatorKey) {
             // TODO(jj): ie8 compat for 'map' and 'some'
-            return authorization.authors.map(function(authorObj) {
-                return authorObj.key;
-            }).concat([authorization.moderatorKey]);
+            return authorKeys.concat([authorization.moderatorKey]);
         }
-        return [];
+        return authorKeys;
     }
 
     if (authorization) {
