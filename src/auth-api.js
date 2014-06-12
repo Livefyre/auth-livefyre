@@ -140,6 +140,7 @@ authApi.updateUser = function (user, userInfo, userInfoCollection) {
     if (uniqueAuthorizations.length > 0) {
         user.authorizations.push.apply(user.authorizations, uniqueAuthorizations);
     }
+    return user;
 };
 
 /**

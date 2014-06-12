@@ -5,7 +5,6 @@ var CollectionAuthorization = require('./collection-authorization');
 
 var permissions = module.exports = {};
 
-permissions._authApi = authApi;
 
 /**
  * Fetch a user's permissions for a Livefyre Collection
@@ -27,8 +26,7 @@ permissions.forCollection = function (tokenOrUser, collection, errback) {
         user = tokenOrUser;
     }
 
-    var updateUser = this._authApi.updateUser.bind(this._authApi);
-    this._authApi.authenticate(opts, function (err, userInfo) {
+    authApi.authenticate(opts, function (err, userInfo) {
         if (err) {
             return errback(err);
         }
@@ -38,8 +36,7 @@ permissions.forCollection = function (tokenOrUser, collection, errback) {
             return errback(err);
         }
 
-        updateUser(user, userInfo);
-        errback(null, user, userInfo);
+        errback(null, userInfo);
     });
 };
 

@@ -6,8 +6,11 @@
  * This should be assumed to be a global singleton.
  */
 
+var authApi = require('./auth-api');
 var EventEmitter = require('event-emitter');
 var inherits = require('inherits');
+var permissions = require('./permissions');
+var session = require('./session');
 
 /**
  * @param {Object} initialAttr
@@ -105,7 +108,8 @@ function isModByCollectionInfo(scopeObj) {
  * @return {boolean}
  */
 function isModByCollectionId(collectionId) {
-    return Boolean(getAuthorizationByCollectionId(collectionId));
+    var authorization = getAuthorizationByCollectionId.call(this, collectionId);
+    return Boolean(authorization && authorization.moderatorKey);
 }
 
 /**
@@ -113,13 +117,14 @@ function isModByCollectionId(collectionId) {
  * @return {CollectionAuthorization}
  */
 function getAuthorizationByCollectionId(collectionId) {
+    var authorization;
     var collection;
     for (var i = 0; i < this.authorizations.length; i++) {
-        var collection = this.authorizations[i];
-        if (this.authorizations[i].moderatorKey &&
-            collection &&
+        authorization = this.authorizations[i];
+        collection = authorization.collection;
+        if (collection &&
             collection.id === collectionId) {
-            return collection;
+            return authorization;
         }
     }
     return null;
@@ -174,17 +179,44 @@ LivefyreUser.prototype.isMod = function(scopeObj) {
 };
 
 /**
- * @param collectionId {string}
- * @return {Array}
+ * Get the erefs keys for this user and for the specified collection.
+ * @param collection {Collection}
+ * @param errback {function(?Error, Array)}
  */
- LivefyreUser.prototype.getKeys = function (collectionId) {
-     var authorization = getAuthorizationByCollectionId.call(this, collectionId);
-     if (authorization) {
-        return authorization.authors.map(function(authorObj) {
-            return authorObj.key;
-        }).push(authorization.moderatorKey);
-     }
- };
+LivefyreUser.prototype.getKeys = function (collection, errback) {
+    var authorization = getAuthorizationByCollectionId.call(this, collection.id);
+    var user = this;
+
+    function collKeyset(authorization) {
+        if (authorization.moderatorKey) {
+            // TODO(jj): ie8 compat for 'map' and 'some'
+            return authorization.authors.map(function(authorObj) {
+                return authorObj.key;
+            }).concat([authorization.moderatorKey]);
+        }
+        return [];
+    }
+
+    if (authorization) {
+        return errback(null, collKeyset(authorization));
+    }
+
+    // user has not yet fetched permissions for this collection, get them now!11
+    permissions.forCollection(user, collection, function (err, userInfo) {
+        if (err) {
+            return errback(err);
+        }
+
+        // update the user for the future
+        authApi.updateUser(user, userInfo);
+
+        // save the session for the far future
+        session.save(userInfo, user);
+
+        authorization = getAuthorizationByCollectionId.call(user, collection.id);
+        errback(null, collKeyset(authorization));
+    });
+};
 
 /**
  * Set up singleton user object.
