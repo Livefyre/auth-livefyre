@@ -8,23 +8,16 @@ var permissions = module.exports = {};
 
 /**
  * Fetch a user's permissions for a Livefyre Collection
- * @param tokenOrUser {string|object} token or user you want permissions for
+ * @param token {string|object} usertoken
  * @param collection.network {string} Network of Collection
  * @param collection.siteId {string} Site ID of Collection
  * @param collection.articleId {string} Article ID of Collection
  * @throws Error if you didn't pass all required Collection info
  */
-permissions.forCollection = function (tokenOrUser, collection, errback) {
+permissions.forCollection = function (token, collection, errback) {
     validateCollection(collection);
-    var user;
     var opts = Object.create(collection);
-    if (typeof tokenOrUser === 'string') {
-        opts.token = tokenOrUser;
-        user = new LivefyreUser();
-    } else {
-        opts.token = tokenOrUser.get('token');
-        user = tokenOrUser;
-    }
+    opts.token = token;
 
     authApi.authenticate(opts, function (err, userInfo) {
         if (err) {

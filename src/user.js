@@ -202,7 +202,7 @@ LivefyreUser.prototype.getKeys = function (collection, errback) {
     }
 
     // user has not yet fetched permissions for this collection, get them now!11
-    permissions.forCollection(user, collection, function (err, userInfo) {
+    permissions.forCollection(user.token, collection, function (err, userInfo) {
         if (err) {
             return errback(err);
         }

@@ -245,6 +245,6 @@ function networkFromToken (token) {
 
 function serverUrlFromToken(token) {
     var network = networkFromToken(token);
-    var serverUrl = document.location.protocol + '//admin.' + 'fy.re';  // hack want server url
+    var serverUrl = document.location.protocol + '//admin.' + network;
     return serverUrl;
 }
