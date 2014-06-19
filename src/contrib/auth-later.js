@@ -11,8 +11,8 @@ var pendingCalls;
 /**
  * Has auth arrived?
  */
-function authHasArrived() {
-    return typeof Livefyre !== 'undefined' && typeof Livefyre['auth'] === 'object';
+function scoutHasArrived() {
+    return typeof Livefyre !== 'undefined' && typeof Livefyre['require'] === 'function';
 }
 
 /**
@@ -58,7 +58,8 @@ function handleAuthHasArrived() {
     flushPendingCalls();
 }
 
-if (hazAuth = authHasArrived()) {
+// TODO: LivefyreJS boolean && auth has methods list and all methods are q'd
+if (scoutHasArrived()) {
     auth = Livefyre['auth'];
 } else {
     pendingCalls = [];
