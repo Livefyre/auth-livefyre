@@ -25,15 +25,15 @@ function flushPendingCalls() {
         methodCall = pendingCalls[i];
         auth[methodCall[0]].apply(auth, methodCall[1]);
     }
-    pendingCalls = null;
+    pendingCalls = [];
 }
 
 /**
  * Proxy a call to Livefyre auth
  * @param {string} methodName
- * @param {Array} args
  */
-function proxyCall(methodName, args) {
+function proxyCall(methodName) {
+    var args = Array.prototype.slice.call(arguments, 1);
     if (hazAuth) {
         return auth[methodName].apply(auth, args);
     }
@@ -53,21 +53,25 @@ function getLivefyreJS() {
  * Yay auth is here!
  */
 function handleAuthHasArrived() {
-    hazAuth = true;
     Livefyre.require(['auth'], function (authModule) {
         auth = authModule;
+        hazAuth = true;
         flushPendingCalls();
     });
 }
 
+/**
+ * Proxy all public auth methods so that they can be invoked before auth is actually on the page.
+ */
 var methodName;
 for (var i = authInterface.length - 1; i >= 0; i--) {
     methodName = authInterface[i];
-    auth[methodName] = function () {
-        return proxyCall(methodName, arguments);
-    }
+    auth[methodName] = proxyCall.bind(auth, methodName);
 }
 
+/**
+ * If we don't have auth, fetch Livefyre.js
+ */
 if (authHasArrived()) {
     handleAuthHasArrived();
 } else {
