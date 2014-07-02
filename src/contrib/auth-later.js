@@ -3,16 +3,17 @@
  * If it isn't, then we fetch Livefyre.js and in set up a proxy/queue to the incoming Livefyre auth.
  */
 
+var auth = {};
+var authInterface = require('auth/contrib/auth-interface');
 var getScript = require('../util/get-script');
-var auth;
-var hazAuth;
-var pendingCalls;
+var hazAuth = false;
+var pendingCalls = [];
 
 /**
- * Has auth arrived?
+ * Has auth arrived? We check that Livefyre.js is on the page, since it haz auth.
  */
-function scoutHasArrived() {
-    return typeof Livefyre !== 'undefined' && typeof Livefyre['require'] === 'function';
+function authHasArrived() {
+    return typeof Livefyre !== 'undefined' && Livefyre['_lfjs'] === true;
 }
 
 /**
@@ -31,13 +32,12 @@ function flushPendingCalls() {
  * Proxy a call to Livefyre auth
  * @param {string} methodName
  * @param {Array} args
- * @param {Boolean} queue
  */
-function proxyCall(methodName, args, queue) {
+function proxyCall(methodName, args) {
     if (hazAuth) {
         return auth[methodName].apply(auth, args);
     }
-    queue && pendingCalls.push([methodName, args]);
+    pendingCalls.push([methodName, args]);
 }
 
 /**
@@ -45,7 +45,7 @@ function proxyCall(methodName, args, queue) {
  */
 function getLivefyreJS() {
     getScript.req('//cdn.livefyre.com/Livefyre.js', function () {
-        Livefyre.on('LivefyreJS.initialized', handleAuthHasArrived);
+        Livefyre.on('initialized', handleAuthHasArrived);
     });
 }
 
@@ -54,31 +54,24 @@ function getLivefyreJS() {
  */
 function handleAuthHasArrived() {
     hazAuth = true;
-    auth = Livefyre['auth'];
-    flushPendingCalls();
+    Livefyre.require(['auth'], function (authModule) {
+        auth = authModule;
+        flushPendingCalls();
+    });
 }
 
-// TODO: LivefyreJS boolean && auth has methods list and all methods are q'd
-if (scoutHasArrived()) {
-    auth = Livefyre['auth'];
-} else {
-    pendingCalls = [];
-    getLivefyreJS();
-
-    // Silly proxy of auth. Some methods are queued b/c we can fulfill them later
-    auth = {
-        authenticate: function () { return proxyCall('authenticate', arguments, true) },
-        delegate: function () { return proxyCall('delegate', arguments, true)},
-        editProfile: function () { return proxyCall('editProfile', arguments, true)},
-        get: function () { return proxyCall('get', arguments) },
-        hasDelegate: function () { return proxyCall('hasDelegate', arguments) },
-        isAuthenticated: function () { return proxyCall('isAuthenticated', arguments) },
-        login: function () { return proxyCall('login', arguments, true) },
-        logout: function () { return proxyCall('logout', arguments, true) },
-        on: function () { return proxyCall('on', arguments, true) },
-        removeListener: function () { return proxyCall('removeListener', arguments, true) },
-        viewProfile: function () { return proxyCall('viewProfile', arguments, true) }
+var methodName;
+for (var i = authInterface.length - 1; i >= 0; i--) {
+    methodName = authInterface[i];
+    auth[methodName] = function () {
+        return proxyCall(methodName, arguments);
     }
+}
+
+if (authHasArrived()) {
+    handleAuthHasArrived();
+} else {
+    getLivefyreJS();
 }
 
 module.exports = auth;
