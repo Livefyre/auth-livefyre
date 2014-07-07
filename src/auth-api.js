@@ -245,6 +245,11 @@ function networkFromToken (token) {
 
 function serverUrlFromToken(token) {
     var network = networkFromToken(token);
-    var serverUrl = document.location.protocol + '//admin.' + network;
+    var serverUrl = document.location.protocol + '//admin.';
+    // when we are serving locally, admin.livefyre.com -> admin.fy.re
+    if (document.location.hostname == 'localhost') {
+        network = 'fy.re';
+    }
+    serverUrl += network;
     return serverUrl;
 }
