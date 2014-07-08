@@ -3,6 +3,7 @@ require.config({
     base64: 'lib/base64/base64',
     'event-emitter': 'lib/event-emitter/src/event-emitter',
     inherits: 'lib/inherits/inherits',
+    '_': 'lib/lodash/dist/lodash',
     md5: 'lib/js-md5/js/md5',
     sinon: 'lib/sinonjs/sinon',
     chai: 'node_modules/chai/chai',
