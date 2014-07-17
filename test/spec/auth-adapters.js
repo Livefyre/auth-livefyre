@@ -43,6 +43,12 @@ function stubFyreUser() {
     };
 }
 
+function stubLivefyreUser() {
+    return {
+        user: mockUserFactory.createUser()
+    };
+}
+
 describe('annotations/adapters/auth-delegates', function() {
     it('whether this is an old delegate', function() {
         // Stub window.fyre
@@ -68,7 +74,7 @@ describe('annotations/adapters/auth-delegates', function() {
 
     it('whether this is a beta delegate', function () {
         var betaDelegate = getMockBetaDelegate();
-        window.Livefyre = mockUserFactory.createUser();
+        window.Livefyre = stubLivefyreUser();
 
         var isOld = authAdapters.isOld(betaDelegate);
 
@@ -80,7 +86,7 @@ describe('annotations/adapters/auth-delegates', function() {
         var betaDelegate;
         beforeEach(function() {
             betaDelegate = getMockBetaDelegate();
-            window.Livefyre = mockUserFactory.createUser();
+            window.Livefyre = stubLivefyreUser();
         });
 
         afterEach(function() {
@@ -134,7 +140,7 @@ describe('annotations/adapters/auth-delegates', function() {
 
             auth.login();
             expect(onceSpy).to.be.calledOnce;
-            expect(onceSpy).to.be.calledWith('login');
+            expect(onceSpy.calledWith('login')).to.be.true;
         });
 
         it('invokes old delegate logout callback correcly', function() {
@@ -143,7 +149,7 @@ describe('annotations/adapters/auth-delegates', function() {
 
             auth.logout();
             expect(onceSpy).to.be.calledOnce;
-            expect(onceSpy).to.be.calledWith('logout');
+            expect(onceSpy.calledWith('logout')).to.be.true;
         });
 
         it('invokes old delegate viewProfile correctly', function() {
@@ -165,7 +171,7 @@ describe('annotations/adapters/auth-delegates', function() {
 
     describe('delegates to beta delegates', function () {
         var betaDelegate = getMockBetaDelegate();
-        window.Livefyre = mockUserFactory.createUser();
+        window.Livefyre = stubLivefyreUser();
 
         var delegateStub = sinon.stub(auth, 'delegate');
 
@@ -179,7 +185,7 @@ describe('annotations/adapters/auth-delegates', function() {
         beforeEach(function() {
             oldDelegate = getMockOldDelegate();
             window.fyre = stubFyreUser();
-            window.Livefyre = mockUserFactory.createUser();
+            window.Livefyre = stubLivefyreUser();
         });
 
         afterEach(function() {

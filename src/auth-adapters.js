@@ -29,7 +29,8 @@ var bind = require('mout/function/bind');
  * @property {function()} logout
  * @property {function()} viewProfile
  * @property {function()} editProfile
- * @property {fucntion()} restoreSession
+ * @property {function()} restoreSession
+ * @property {string} serverUrl
  */
 
 /**
