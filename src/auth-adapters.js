@@ -152,9 +152,7 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
         var originalFn = delegate.login;
         return function (authenticate) {
             originalFn.call(delegate, {
-                success: function () {
-                    handleChangeToken(fyre.conv.user.get('token'));
-                },
+                success: function () {},
                 failure: function () {}
             });
         };
@@ -198,12 +196,14 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
  * @param {string} articleId
  * @param {string} siteId
  * @param {string} networkId
+ * @param {string} environment
  */
 function oldToNew(delegate, articleId, siteId, networkId, environment) {
     if (isBetaDelegate(delegate)) {
         return adaptBetaDelegate(delegate, articleId, siteId);
+    } else if (isFyreOld(delegate)) {
+        return adaptOldDelegate(delegate, articleId, siteId, networkId, environment);
     }
-    return adaptOldDelegate(delegate, articleId, siteId, networkId, environment);
 }
 
 module.exports = {
