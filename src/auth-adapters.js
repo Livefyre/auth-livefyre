@@ -150,11 +150,8 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
 
     newDelegate.login = (function () {
         var originalFn = delegate.login;
-        return function (authenticate) {
-            originalFn.call(delegate, {
-                success: function () {},
-                failure: function () {}
-            });
+        return function () {
+            originalFn.call(delegate, handler);
         };
     })();
 
