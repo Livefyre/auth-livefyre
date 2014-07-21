@@ -1,9 +1,10 @@
 var auth = require('auth');
 var authAdapters = require('livefyre-auth/auth-adapters');
 var expect = require('chai').expect;
-var sinon = require('sinon');
+var LivefyreUser = require('livefyre-auth/user');
 var MockUserFactory = require('livefyre-auth-tests/mocks/mock-user-factory');
 var mockUserFactory = new MockUserFactory();
+var sinon = require('sinon');
 
 function getMockOldDelegate() {
     return {
@@ -95,11 +96,13 @@ describe('annotations/adapters/auth-delegates', function() {
         });
 
         it('invokes old delegate login method correcly', function() {
+            var newDelegate = authAdapters.oldToNew(betaDelegate);
+            auth.delegate(newDelegate);
             var loginSpy = sinon.spy(betaDelegate, 'login');
-            authAdapters.oldToNew(betaDelegate);
 
             auth.login();
             expect(loginSpy).to.be.calledOnce;
+            loginSpy.restore();
         });
 
         it('authenticates with the correct collection and auth endpoint', function() {
@@ -107,7 +110,8 @@ describe('annotations/adapters/auth-delegates', function() {
             window.Livefyre.user.once = function (ev, callback) {
                 cb = callback;
             };
-            authAdapters.oldToNew(betaDelegate, 123, 456);
+            var newDelegate = authAdapters.oldToNew(betaDelegate, 123, 456);
+            auth.delegate(newDelegate);
             var remoteLoginSpy = sinon.spy(auth, 'authenticate');
             auth.login();
             cb({
@@ -118,17 +122,16 @@ describe('annotations/adapters/auth-delegates', function() {
 
             expect(remoteLoginSpy).to.be.calledOnce;
             var spyData = remoteLoginSpy.getCall(0).args[0];
-            expect(spyData.livefyre.token).to.equal('tokenator');
-            expect(spyData.livefyre.articleId).to.equal(123);
-            expect(spyData.livefyre.siteId).to.equal(456);
-            expect(spyData.livefyre.serverUrl).to.equal(betaDelegate.serverUrl) ;
+            expect(spyData.livefyre).to.be.an.instanceof(LivefyreUser);
+            expect(spyData.livefyre.get('token')).to.equal('tokenator');
 
             remoteLoginSpy.restore();
         });
 
         it('invokes old delegate logout method correcly', function() {
+            var newDelegate = authAdapters.oldToNew(betaDelegate);
+            auth.delegate(newDelegate);
             var logoutSpy = sinon.spy(betaDelegate, 'logout');
-            authAdapters.oldToNew(betaDelegate);
 
             auth.logout();
             expect(logoutSpy).to.be.calledOnce;
@@ -136,7 +139,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate login callback correcly', function() {
             var onceSpy = sinon.spy(window.Livefyre.user, 'once');
-            authAdapters.oldToNew(betaDelegate);
+            var newDelegate = authAdapters.oldToNew(betaDelegate);
+            auth.delegate(newDelegate);
 
             auth.login();
             expect(onceSpy).to.be.calledOnce;
@@ -145,7 +149,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate logout callback correcly', function() {
             var onceSpy = sinon.spy(window.Livefyre.user, 'once');
-            authAdapters.oldToNew(betaDelegate);
+            var newDelegate = authAdapters.oldToNew(betaDelegate);
+            auth.delegate(newDelegate);
 
             auth.logout();
             expect(onceSpy).to.be.calledOnce;
@@ -220,7 +225,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate login method correcly', function() {
             var loginSpy = sinon.spy(oldDelegate, 'login');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             auth.login();
             expect(loginSpy).to.be.calledOnce;
@@ -231,7 +237,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate logout method correcly', function() {
             var logoutSpy = sinon.spy(oldDelegate, 'logout');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             auth.logout();
             expect(logoutSpy).to.be.calledOnce;
@@ -239,7 +246,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate viewProfile correctly', function() {
             var viewProfileSpy = sinon.spy(oldDelegate, 'viewProfile');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             auth.viewProfile(123);
             expect(viewProfileSpy).to.be.calledOnce;
@@ -251,7 +259,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate editProfile correctly', function() {
             var editProfileSpy = sinon.spy(oldDelegate, 'editProfile');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             auth.editProfile(123);
             expect(editProfileSpy).to.be.calledOnce;
@@ -263,7 +272,8 @@ describe('annotations/adapters/auth-delegates', function() {
 
         it('invokes old delegate loginByCookie correctly', function() {
             var loginByCookieSpy = sinon.spy(oldDelegate, 'loginByCookie');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             expect(loginByCookieSpy).to.be.calledOnce;
             expect(loginByCookieSpy.getCall(0).args.length).to.equal(0);
@@ -272,7 +282,8 @@ describe('annotations/adapters/auth-delegates', function() {
         it('binds to old delegate user token changes', function() {
             var fyreOnSpy = sinon.spy(window.fyre.conv.user, 'on');
             var fyreOffSpy = sinon.spy(window.fyre.conv.user, 'off');
-            authAdapters.oldToNew(oldDelegate);
+            var newDelegate = authAdapters.oldToNew(oldDelegate);
+            auth.delegate(newDelegate);
 
             expect(fyreOnSpy).to.be.calledOnce;
             expect(fyreOnSpy.getCall(0).args[0]).to.equal('change:token');
@@ -285,7 +296,8 @@ describe('annotations/adapters/auth-delegates', function() {
             window.fyre.conv.user.on = function (ev, callback) {
                 cb = callback;
             };
-            authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co');
+            var newDelegate = authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co');
+            auth.delegate(newDelegate);
             var remoteLoginSpy = sinon.spy(auth, 'authenticate');
             cb({}, 'tokenator');
 
@@ -306,16 +318,14 @@ describe('annotations/adapters/auth-delegates', function() {
             window.fyre.conv.user.on = function (ev, callback) {
                 cb = callback;
             };
-            authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co');
+            var newDelegate = authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co');
+            auth.delegate(newDelegate);
             var remoteLoginSpy = sinon.spy(auth, 'authenticate');
             cb({}, 'tokenator');
 
             expect(remoteLoginSpy).to.be.calledOnce;
             var spyData = remoteLoginSpy.getCall(0).args[0];
             expect(spyData.livefyre.token).to.equal('tokenator');
-            expect(spyData.livefyre.articleId).to.equal(123);
-            expect(spyData.livefyre.siteId).to.equal(456);
-            expect(spyData.livefyre.serverUrl.indexOf('admin.test.fyre.co') > -1).to.be.true;
 
             remoteLoginSpy.restore();
         });
@@ -325,16 +335,14 @@ describe('annotations/adapters/auth-delegates', function() {
             window.fyre.conv.user.on = function (ev, callback) {
                 cb = callback;
             };
-            authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co', 'qa.fyre.co');
+            var newDelegate = authAdapters.oldToNew(oldDelegate, 123, 456, 'test.fyre.co', 'qa.fyre.co');
+            auth.delegate(newDelegate);
             var remoteLoginSpy = sinon.spy(auth, 'authenticate');
             cb({}, 'tokenator');
 
             expect(remoteLoginSpy).to.be.calledOnce;
             var spyData = remoteLoginSpy.getCall(0).args[0];
             expect(spyData.livefyre.token).to.equal('tokenator');
-            expect(spyData.livefyre.articleId).to.equal(123);
-            expect(spyData.livefyre.siteId).to.equal(456);
-            expect(spyData.livefyre.serverUrl.indexOf('admin.qa.fyre.co') > -1).to.be.true;
 
             remoteLoginSpy.restore();
         });

@@ -3,7 +3,9 @@
  * @fileoverview Auth delegate adapters for old to new delegates.
  */
 var auth = require('auth');
+var authApi = require('./auth-api');
 var bind = require('mout/function/bind');
+var LivefyreUser = require('./user');
 
 /**
  * @typedef {Object} OldAuthDelegate
@@ -65,22 +67,23 @@ function isOld(delegate) {
     return isFyreOld(delegate) || isBetaDelegate(delegate);
 }
 
-function adaptBetaDelegate(delegate, articleId, siteId) {
+function adaptBetaDelegate(delegate) {
     var newDelegate = {};
     var Livefyre = window.Livefyre;
 
     newDelegate.login = (function () {
         var originalFn = delegate.login;
-        return function (authenticate) {
+        return function () {
             originalFn.call(delegate);
             Livefyre.user.once('login', function (userInfo) {
+                var user = new LivefyreUser();
+                // Store the serverUrl
+                // TODO(jj): I am kicking myself due to this pattern of copying around the serverUrl
+                // b/c it has become spaghetti code
+                userInfo.serverUrl = delegate.serverUrl;
+                user = authApi.updateUser(user, userInfo);
                 auth.authenticate({
-                    livefyre: {
-                        token: userInfo.token.value,
-                        articleId: articleId,
-                        siteId: siteId,
-                        serverUrl: delegate.serverUrl
-                    }
+                    livefyre: user
                 });
             });
         };
@@ -100,10 +103,10 @@ function adaptBetaDelegate(delegate, articleId, siteId) {
 
     newDelegate.editProfile = bind(delegate.editProfile, delegate);
 
-    return auth.delegate(newDelegate);
+    return newDelegate;
 }
 
-function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
+function adaptOldDelegate(delegate) {
     var fyre = window.fyre;
 
     function handleChangeToken(token) {
@@ -112,22 +115,13 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
         }
         auth.authenticate({
             livefyre: {
-                token: token,
-                articleId: articleId,
-                siteId: siteId,
-                serverUrl: document.location.protocol + '//admin.' + (environment || networkId)
+                token: token
             }
         });
     }
 
     fyre.conv.user.on('change:token', function (user, token) {
         handleChangeToken(token);
-    });
-    fyre.conv.initializeGlobalServices({
-        articleId: articleId,
-        siteId: siteId,
-        networkId: networkId,
-        authDelegate: delegate
     });
 
     if (!fyre.conv.ready.hasFired()) {
@@ -181,10 +175,9 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
         };
     })();
 
-    auth.delegate(newDelegate);
-
-    // Restore the session
     delegate.loginByCookie();
+
+    return newDelegate;
 }
 
 /**
@@ -195,11 +188,13 @@ function adaptOldDelegate(delegate, articleId, siteId, networkId, environment) {
  * @param {string} networkId
  * @param {string} environment
  */
-function oldToNew(delegate, articleId, siteId, networkId, environment) {
+function oldToNew(delegate) {
     if (isBetaDelegate(delegate)) {
-        return adaptBetaDelegate(delegate, articleId, siteId);
+        return adaptBetaDelegate(delegate);
     } else if (isFyreOld(delegate)) {
-        return adaptOldDelegate(delegate, articleId, siteId, networkId, environment);
+        return adaptOldDelegate(delegate);
+    } else {
+        return delegate;
     }
 }
 
