@@ -6,6 +6,8 @@ Learn to use Livefyre's all-in-one user management system
 
 If you purchased Livefyre Enterprise Profiles, use these steps to use it on your webpages using AppKit Auth so that Livefyre Apps can easily take advantage of your auth integration.
 
+You can see an example integration in action [here](http://codepen.io/zjj/pen/frhLv).
+
 If you are using another Identity Management System, whether from another provider or a homegrown solution, checkout the [User Authentication](http://docs.livefyre.com/developers/user-auth/) index. If you think Livefyre Enterprise Profiles may be a good fit for your community, contact your Livefyre Account Manager.
 
 ---
