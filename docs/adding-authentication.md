@@ -2,7 +2,7 @@
 
 Note: These documents are for Beta distribution only, and should not be considered finalized product. Please consult your Livefyre Technical Account Manager before implementing any functionality based on this documentation.
 
-This section demonstrates how to add authentication to Liveyfyre Apps using Livefyre.require and Appkit Auth. The focus of this section is on the client side Javascript code. For documentation detailing user tokens generated server side one may refer to the [User Auth Token](/developers/getting-started/tokens/auth/) section. For documentation detailing syncing user profiles one may refer to the [Ping for Pull](TODO(jj): Ping for Pull URL) section. 
+This section demonstrates how to add authentication to Livefyre Apps using Livefyre.require and Appkit Auth. The focus of this section is on the client side Javascript code. For documentation detailing user tokens generated server side one may refer to the [User Auth Token](/developers/getting-started/tokens/auth/) section. For documentation detailing syncing user profiles one may refer to the [Ping for Pull](TODO(jj): Ping for Pull URL) section. 
 
 ## The Auth Package
 
