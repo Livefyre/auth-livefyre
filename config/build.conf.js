@@ -9,6 +9,7 @@
   out: '../dist/livefyre-auth.min.js',
   preserveLicenseComments: false,
   cjsTranslate: true,
+  optimize: 'none',
   wrap: {
     startFile: 'wrap-start.frag',
     endFile: 'wrap-end.frag'

@@ -46,9 +46,10 @@ module.exports = function (auth, serverUrl, opts) {
                 serverUrl: serverUrl
             };
         } else if (typeof credentials === 'object') {
+            debugger;
             credentials = {
                 token: credentials.lftoken,
-                serverUrl: credentials.serviceUrl
+                serverUrl: credentials.serverUrl
             };
         }
         // The LivefyreAuthDelegate will be able to construct a user
