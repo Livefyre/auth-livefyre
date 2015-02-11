@@ -48,7 +48,7 @@ module.exports = function (auth, serverUrl, opts) {
         } else if (typeof credentials === 'object') {
             credentials = {
                 token: credentials.lftoken,
-                serverUrl: serverUrl,
+                serverUrl: credentials.serverUrl ?  credentials.serverUrl : serverUrl,
                 network: credentials.network
             };
         }
