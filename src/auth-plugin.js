@@ -45,13 +45,13 @@ module.exports = function (auth, serverUrl, opts) {
                 token: credentials,
                 serverUrl: serverUrl
             };
-        } else if (typeof credentials === 'object') {
+        } /*else if (typeof credentials === 'object') {
             credentials = {
                 token: credentials.lftoken,
                 serverUrl: credentials.serverUrl ?  credentials.serverUrl : serverUrl,
                 network: credentials.network
             };
-        }
+        }*/
         // The LivefyreAuthDelegate will be able to construct a user
         // by nature of its login process. Those are valid credentials
         // in place of a token, and we can save making an extra request
