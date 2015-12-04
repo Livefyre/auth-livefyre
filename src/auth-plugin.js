@@ -36,7 +36,7 @@ module.exports = function (auth, serverUrl, opts) {
 
     // When there are credentials for Livefyre
     // authenticate the user and call auth.login({ livefyre: user })
-    auth.on('authenticate.livefyre', function (credentials) {
+    auth.on('authenticate.livefyre', function (credentials, callback) {
         if ( ! credentials) {
             return;
         }
@@ -45,7 +45,9 @@ module.exports = function (auth, serverUrl, opts) {
         // by nature of its login process. Those are valid credentials
         // in place of a token, and we can save making an extra request
         if (credentials instanceof LivefyreUser) {
-            return login(credentials);
+            login(credentials);
+            callback && callback();
+            return;
         } else if (typeof credentials === 'string') {
             credentials = {
                 token: credentials,
@@ -73,6 +75,7 @@ module.exports = function (auth, serverUrl, opts) {
             }
             session.save(userInfo, user);
             login(user);
+            callback && callback();
         });
     });
 
