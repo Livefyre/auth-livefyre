@@ -1,0 +1,32 @@
+<html>
+<head>
+</head>
+<body>
+    <script type="text/javascript">
+      function login() {
+        window.dispatchEvent(new Event('userAuthenticated'));
+        console.log("logging in");
+      }
+
+      function logout() {
+        window.dispatchEvent(new Event('userLogOut'));
+        console.log("logging in");
+      }
+    </script>
+    <button onclick="login()">Log in!</button>
+    <button onclick="logout()">Log out!</button>
+    <div id="wall"></div>
+    <div id="livefyre-app-custom-1447718337022"></div>
+    <link rel="stylesheet" href="http://10.1.107.135:9111/wjs/css/livefyre_main_mobile.css">
+    <script src="http://10.1.107.135:9111/compile?id=lfconv"></script>
+    <script src="http://cdn.livefyre.com/Livefyre.js"></script>
+    <script src="../../lib/cajon/cajon.js"></script>
+    <script src="../../config/requirejs.conf.js"></script>
+    <script>
+        require.config({
+            baseUrl: '../../'
+        });
+        require(['demos/boog/main-demo']);
+    </script>
+</body>
+</html>
