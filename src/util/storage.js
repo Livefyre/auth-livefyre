@@ -30,12 +30,11 @@ var html5Storage = {
      * @param {number=} opt_expiration In UTC time
      */
     set: function(key, value, opt_expiration) {
-        var valueObj = {
-            value: value,
-            expiration: opt_expiration || null
-        };
         try {
-            localStorage.setItem(key, JSON.stringify(valueObj));
+            localStorage.setItem(key, JSON.stringify({
+                value: value,
+                expiration: opt_expiration || null
+            }));
         } catch(e) {}
     },
 
@@ -89,7 +88,7 @@ var cookieStorage = {
             return new Date(exp).toUTCString();
         }
 
-        var expiration, expiresStr, oneWeekMs = 604800000;
+        var expiration, oneWeekMs = 604800000;
 
         if (opt_expiration > 0) {
             expiration = convertExpiration(opt_expiration);
@@ -99,7 +98,10 @@ var cookieStorage = {
             expiration = (+new Date() + oneWeekMs);
         }
 
-        document.cookie = key + '=' + JSON.stringify(value) + expiresStr;
+        document.cookie = key + '=' + JSON.stringify({
+            value: value,
+            expiration: expiration
+        });
     },
 
     /**
