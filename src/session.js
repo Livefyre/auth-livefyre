@@ -1,5 +1,5 @@
 var authApi = require('./auth-api');
-var deepClone = require('mout/lang/deepClone');
+var deepClone = require('mout/src/lang/deepClone');
 var LivefyreUser = require('./user');
 var storage = require('./util/storage');
 

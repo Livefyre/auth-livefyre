@@ -8,7 +8,7 @@
 
 var EventEmitter = require('event-emitter');
 var inherits = require('inherits');
-var some = require('mout/array/some');
+var some = require('mout/src/array/some');
 
 /**
  * @param {Object} initialAttr

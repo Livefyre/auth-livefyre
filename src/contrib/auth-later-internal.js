@@ -4,7 +4,7 @@
  */
 var authInterface = require('auth-interface');
 var getScript = require('../util/get-script');
-var bind = require('mout/function/bind');
+var bind = require('mout/src/function/bind');
 
 exports.hazAuth = false;
 exports.pendingCalls = [];
