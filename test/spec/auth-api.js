@@ -43,6 +43,20 @@ describe('livefyre-auth/auth-api', function () {
             });
         });
 
+        it('works with URL-safe tokens', function (done) {
+            // Patch authApi._authApi to return a response
+            // as if we only passed a token, no collection info
+            var modAuthApi = createMockAuthApi(modResponse);
+            var reqSpy = sinon.spy(modAuthApi, '_request');
+            var opts = {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkaXNwbGF5X25hbWUiOiJTaXRlIFVzZXI_IiwiZG9tYWluIjoiYWR2YW5jZWRpZ2l0YWwuZnlyZS5jbyIsImV4cGlyZXMiOjExNDk5OTYwNjMxLjA1MDU3LCJ1c2VyX2lkIjoiMTA1NTk0NTkifQ.lIYK7UcT_PQA-wYoVeWXWCQPurhJiUGTdgN5NZblYrw'
+            };
+            modAuthApi.authenticate(opts, function (err, userInfo) {
+                assert(reqSpy.calledWith("http://advancedigital.admin.fyre.co/api/v3.0/auth/?lftoken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkaXNwbGF5X25hbWUiOiJTaXRlIFVzZXI_IiwiZG9tYWluIjoiYWR2YW5jZWRpZ2l0YWwuZnlyZS5jbyIsImV4cGlyZXMiOjExNDk5OTYwNjMxLjA1MDU3LCJ1c2VyX2lkIjoiMTA1NTk0NTkifQ.lIYK7UcT_PQA-wYoVeWXWCQPurhJiUGTdgN5NZblYrw"));
+                done(err);
+            });
+        });
+
         it('uses a network if provided', function (done) {
             // Patch authApi._authApi to return a response
             // as if we only passed a token, no collection info
