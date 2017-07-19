@@ -4,7 +4,7 @@
  */
 var auth = require('auth');
 var authApi = require('./auth-api');
-var bind = require('mout/function/bind');
+var bind = require('mout/src/function/bind');
 var LivefyreUser = require('./user');
 var session = require('./session');
 

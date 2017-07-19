@@ -1,7 +1,7 @@
 'use strict';
 
 var authApi = require('./auth-api');
-var map = require('mout/array/map');
+var map = require('mout/src/array/map');
 var session = require('./session');
 
 var permissions = module.exports = {};

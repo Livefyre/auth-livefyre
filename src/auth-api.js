@@ -1,8 +1,8 @@
 var base64 = require('base64');
 var CollectionAuthorization = require('./collection-authorization');
-var filter = require('mout/array/filter');
+var filter = require('mout/src/array/filter');
 var jsonp = require('./util/jsonp');
-var map = require('mout/array/map');
+var map = require('mout/src/array/map');
 
 /**
  * An Object that can talk to Livefyre's Auth API over HTTP
