@@ -1,1 +1,1 @@
-module.exports = require('livefyre-auth/contrib/auth-later-internal').getAuth();
+module.exports = require('./auth-later-internal').getAuth();
