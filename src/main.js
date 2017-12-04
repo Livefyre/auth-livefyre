@@ -1,7 +1,9 @@
 'use strict';
 
 var auth = require('auth');
+var optOutAuthDelegate = require('./opt-out-auth-delegate');
 var plugin = require('./auth-plugin');
+var session = require('./session');
 
 /*
 livefyre-auth
@@ -23,3 +25,14 @@ exports.api = require('./auth-api');
 
 // plugin to another `auth`
 exports.authPlugin = plugin;
+
+// Override the delegate function by forcing the opt out delegate to be used
+// instead of the delegate that was actually passed in.
+exports.optOut = function () {
+  var delegate = auth.delegate;
+  auth.delegate = function () {
+    delegate(new optOutAuthDelegate());
+  };
+
+  session.clear();
+};
