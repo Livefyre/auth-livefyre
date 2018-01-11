@@ -263,7 +263,7 @@ function getDomain(network) {
 
 function serverUrlFromNetwork(network) {
     var domain = getDomain(network);
-    var protocol = "https";
+    var protocol = 'https:';
     if (domain === 'livefyre') {
         return protocol + '//' + 'admin.' + network;
     }
