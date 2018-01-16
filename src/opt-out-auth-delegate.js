@@ -11,7 +11,7 @@ var DELEGATE_METHODS = [
 ];
 
 /**
- * GDPR Opt Out auth delegate. Used as default delegate if opt out is enabled.
+ * Opt out auth delegate. Used as default delegate if opt out is enabled.
  */
 module.exports = function () {
     DELEGATE_METHODS.forEach(function (method) {
