@@ -15,12 +15,12 @@
     "inherits": "git://github.com/Livefyre/inherits.git",
     "debug": "visionmedia/debug#~0.7.4",
     "js-md5": "~1.1.0",
-    "auth": "Livefyre/auth#master",
+    "auth": "Livefyre/auth#^0.4.2",
     "mout": "~0.9.1",
     "auth-interface": "Livefyre/auth-interface"
   },
   "resolutions": {
-    "auth": "^0.4.1",
+    "auth": "^0.4.2",
     "view": "~1.3",
     "base64": "~0.4.0",
     "livefyre-bootstrap": "~1.5.7"
